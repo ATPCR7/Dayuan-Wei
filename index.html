@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intraoperative Hypothermia Predictive Model for Elderly Patients</title>
+    <script>
+        function calculate() {
+            // 获取用户输入的各项数值
+            let height = parseFloat(document.getElementById('height').value); // 身高（米）
+            let weight = parseFloat(document.getElementById('weight').value); // 体重（千克）
+            let bmi = weight / (height * height); // 计算BMI值
+            let preAnesthesiaTemp = parseFloat(document.getElementById('x1').value);
+            let anesthesiaMethod = document.getElementById('x3').value;
+            let limbSurgery = document.getElementById('x4').value;
+            let chestSurgery = document.getElementById('x5').value;
+            let abdominalSurgery = document.getElementById('x6').value;
+            let surgeryDuration = parseFloat(document.getElementById('x7').value);
+
+            // 系数定义
+            const a = -3.307;
+            const b = -0.092;
+            const c = 1.053;
+            const d = 1.321;
+            const e = 2.590;
+            const f = 0.894;
+            const h = 0.005;
+            const i = 120.624;
+
+            // 处理麻醉方式和手术部位的布尔值
+            let x3Val = anesthesiaMethod === 'Combined intravenous and inhalation anesthesia add epidural and/or nerve block anesthesia' ? 1 : 0;
+            let x4Val = limbSurgery === 'Yes' ? 1 : 0;
+            let x5Val = chestSurgery === 'Yes' ? 1 : 0;
+            let x6Val = abdominalSurgery === 'Yes' ? 1 : 0;
+
+            // 计算预测模型中的log值
+            let log = a * preAnesthesiaTemp + b * bmi + c * x3Val + d * x4Val + e * x5Val + f * x6Val + h * surgeryDuration + i;
+
+            // 根据模型计算预测概率
+            let probability = 1 / (1 + Math.exp(-log)) * 100;
+
+            // 显示预测结果
+            document.getElementById('result').innerHTML = "Incidence：" + probability.toFixed(2) + "%";
+        }
+    </script>
+</head>
+<body>
+    <h1>Intraoperative Hypothermia Predictive Model for Elderly Patients</h1>
+    <form>
+        <label for="x1">Temperature before anesthesia induction（℃）：</label>
+        <input type="number" id="x1" required><br>
+
+        <label for="height">Height (meters)：</label>
+        <input type="number" step="0.01" id="height" required><br>
+
+        <label for="weight">Weight (kilograms)：</label>
+        <input type="number" id="weight" required><br>
+
+        <label for="x3">Anesthesia method：</label>
+        <select id="x3" required>
+            <option value="Combined intravenous and inhalation anesthesia add epidural and/or nerve block anesthesia">Combined intravenous and inhalation anesthesia add epidural and/or nerve block anesthesia</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label for="x4">Limb operation：</label>
+        <select id="x4" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select><br>
+
+        <label for="x5">Thoracic operation：</label>
+        <select id="x5" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select><br>
+
+        <label for="x6">Abdominal operation：</label>
+        <select id="x6" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select><br>
+
+        <label for="x7">Operation duration（min）：</label>
+        <input type="number" id="x7" required><br>
+
+        <button type="button" onclick="calculate()">Calculate</button>
+    </form>
+    <p id="result"></p>
+</body>
+</html>
